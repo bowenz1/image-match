@@ -10,7 +10,7 @@ class SignatureES(SignatureDatabaseBase):
 
     """
 
-    def __init__(self, es, index='images', doc_type='image', timeout='60', size=100,
+    def __init__(self, es, index='images', doc_type='image', size=100,
                  *args, **kwargs):
         """Extra setup for Elasticsearch
 
@@ -41,7 +41,6 @@ class SignatureES(SignatureDatabaseBase):
         self.es = es
         self.index = index
         self.doc_type = doc_type
-        self.timeout = timeout
         self.size = size
 
         super(SignatureES, self).__init__(*args, **kwargs)
