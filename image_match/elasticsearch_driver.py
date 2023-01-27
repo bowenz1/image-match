@@ -52,12 +52,12 @@ class SignatureES(SignatureDatabaseBase):
             rec.pop('metadata')
 
         # build the 'should' list
-        should = [{'term': {'{}.{}'.format(self.doc_type, word): rec[word]}} for word in rec]
+        should = [{'term': {word: rec[word]}} for word in rec]
         body = {
             'query': {
                    'bool': {'should': should}
             },
-            '_source': {'excludes': ['{}.simple_word_*'.format(self.doc_type)]}
+            '_source': {'excludes': ['simple_word_*']}
         }
 
         if pre_filter is not None:
@@ -67,7 +67,7 @@ class SignatureES(SignatureDatabaseBase):
                               body=body,
                               size=self.size)['hits']['hits']
 
-        sigs = np.array([x['_source'][self.doc_type]['signature'] for x in res])
+        sigs = np.array([x['_source']['signature'] for x in res])
 
         if sigs.size == 0:
             return []
@@ -76,8 +76,8 @@ class SignatureES(SignatureDatabaseBase):
 
         formatted_res = [{'id': x['_id'],
                           'score': x['_score'],
-                          'metadata': x['_source'][self.doc_type].get('metadata'),
-                          'path': x['_source'][self.doc_type].get('url', x['_source'][self.doc_type].get('path'))}
+                          'metadata': x['_source'].get('metadata'),
+                          'path': x['_source'].get('url', x['_source'].get('path'))}
                          for x in res]
 
         for i, row in enumerate(formatted_res):
@@ -88,7 +88,7 @@ class SignatureES(SignatureDatabaseBase):
 
     def insert_single_record(self, rec, refresh_after=False):
         rec['timestamp'] = datetime.now()
-        self.es.index(index=self.index, body={ self.doc_type: rec }, refresh=refresh_after)
+        self.es.index(index=self.index, body=rec, refresh=refresh_after)
 
     def delete_duplicates(self, path):
         """Delete all but one entries in elasticsearch whose `path` value is equivalent to that of path.
