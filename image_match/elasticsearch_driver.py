@@ -40,7 +40,6 @@ class SignatureES(SignatureDatabaseBase):
         """
         self.es = es
         self.index = index
-        self.doc_type = doc_type
         self.size = size
 
         super(SignatureES, self).__init__(*args, **kwargs)
@@ -98,11 +97,11 @@ class SignatureES(SignatureDatabaseBase):
         matching_paths = [item['_id'] for item in
                           self.es.search(body={'query':
                                                {'match':
-                                                {'{}.path'.format(self.doc_type): path}
+                                                {'path': path}
                                                }
                                               },
                                          index=self.index)['hits']['hits']
-                          if item['_source'][self.doc_type]['path'] == path]
+                          if item['_source']['path'] == path]
         if len(matching_paths) > 0:
             for id_tag in matching_paths[1:]:
                 self.es.delete(index=self.index, id=id_tag)
