@@ -66,7 +66,7 @@ class SignatureES(SignatureDatabaseBase):
         res = self.es.search(index=self.index,
                               body=body,
                               size=self.size,
-                              timeout=self.timeout)['hits']['hits']
+                              timeout=30)['hits']['hits']
 
         sigs = np.array([x['_source'][self.doc_type]['signature'] for x in res])
 
